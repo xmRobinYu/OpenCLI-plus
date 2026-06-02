@@ -92,6 +92,9 @@ describe('formatExternalCliLabel', () => {
     expect(formatExternalCliLabel({ name: 'wecom-cli', binary: 'wecom-cli', package: '企业微信' })).toBe(
       'wecom-cli(企业微信)',
     );
+    expect(formatExternalCliLabel({ name: 'bili', binary: 'bili', package: 'bilibili-cli' })).toBe(
+      'bili(bilibili-cli)',
+    );
   });
 });
 

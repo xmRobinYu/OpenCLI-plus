@@ -15,7 +15,7 @@ OpenCLI gives you one surface for three different kinds of automation:
 - **Let AI Agents operate any website** — install the `opencli-browser` skill in your AI agent (Claude Code, Cursor, etc.), and it can navigate, click, type/fill, extract, and inspect any page through your logged-in browser via `opencli browser` primitives.
 - **Write new adapters** end-to-end with `opencli browser` + the `opencli-adapter-author` skill, which guides from first recon through field decoding, code, and `opencli browser verify`.
 
-It also works as a **CLI hub** for local tools such as `gh`, `docker`, `longbridge`, `tg`, `discord`, `wx`, `ntn` (Notion), and other binaries you register yourself, plus **desktop app adapters** for Electron apps like Cursor, Trae CN, Codex, Antigravity, ChatGPT, and Trae SOLO.
+It also works as a **CLI hub** for local tools such as `gh`, `docker`, `longbridge`, `bili(bilibili-cli)`, `lark-cli`, `zsxq-cli`, `tg`, `discord`, `wx`, `ntn` (Notion), and other binaries you register yourself, plus **desktop app adapters** for Electron apps like Cursor, Trae CN, Codex, Antigravity, ChatGPT, and Trae SOLO.
 
 ## Quick Start
 
@@ -73,6 +73,7 @@ Use OpenCLI directly when you want a reliable command instead of a live browser 
 
 - `opencli list` shows every registered command.
 - `opencli <site> <command>` runs a built-in or generated adapter.
+- `opencli open <url>` routes a URL to the most likely built-in adapter command.
 - `opencli external register mycli` exposes a local CLI through the same discovery surface.
 - `opencli doctor` helps diagnose browser connectivity.
 
@@ -171,7 +172,7 @@ When the site you need is not yet covered, use the `opencli-adapter-author` skil
 |------|----------|
 | **xiaohongshu** | `search` `note` `comments` `feed` `user` `download` `publish` `notifications` `creator-notes` `creator-notes-summary` `creator-note-detail` `creator-profile` `creator-stats` |
 | **WeChat Channels** (视频号) | `publish` |
-| **bilibili** | `hot` `search` `history` `feed` `ranking` `download` `comments` `dynamic` `favorite` `following` `me` `subtitle` `summary` `video` `user-videos` |
+| **bilibili** | `hot` `search` `status` `history` `history-bridge` `feed` `feed-bridge` `my-dynamics` `dynamic-post` `dynamic-delete` `ranking` `download` `comments` `dynamic` `favorite` `favorites` `following` `following-bridge` `me` `whoami` `user` `watch-later` `subtitle` `summary` `video` `user-videos` |
 | **zhihu** | `hot` `search` `question` `download` `follow` `like` `favorite` `comment` `answer` |
 | **hackernews** | `top` `new` `best` `ask` `show` `jobs` `search` `user` |
 | **geogebra** | `eval` `add-point` `add-line` `add-circle` `add-polygon` `triangle` `hexagon` `list` `info` |
@@ -183,6 +184,8 @@ When the site you need is not yet covered, use the `opencli-adapter-author` skil
 | **notebooklm** | `status` `list` `open` `current` `get` `history` `summary` `note-list` `notes-get` `source-list` `source-get` `source-fulltext` `source-guide` |
 | **amazon** | `bestsellers` `search` `product` `offer` `discussion` `movers-shakers` `new-releases` `rankings` |
 | **upwork** | `search` `feed` `detail` |
+| **zsxq** | `groups` `dynamics` `topics` `topic` `search` `download` |
+| **feishu** | `doc` |
 
 Curated highlights — **[→ see all 100+ supported sites & commands](./docs/adapters/index.md)** (douyin / weibo / spotify / 1688 / quark / nowcoder / google-scholar / hupu / xianyu / weread / weread-official / xiaoyuzhou / Chess.com / and more).
 
@@ -190,7 +193,15 @@ Curated highlights — **[→ see all 100+ supported sites & commands](./docs/ad
 
 Unified passthrough for your existing command-line tools. Run `opencli <tool> ...` for any of:
 
-`gh` · `docker` · `vercel` · `wrangler` · `obsidian` · `longbridge` · `lark-cli` · `ntn(notion)` · `dws(DingTalk Workspace)` · `wecom-cli(企业微信)` · `tg(tg-cli)` · `discord(discord-cli)` · `wx(wx-cli)`
+`gh` · `docker` · `vercel` · `wrangler` · `obsidian` · `longbridge` · `bili(bilibili-cli)` · `lark-cli` · `zsxq-cli` · `ntn(notion)` · `dws(DingTalk Workspace)` · `wecom-cli(企业微信)` · `tg(tg-cli)` · `discord(discord-cli)` · `wx(wx-cli)`
+
+Example:
+
+```bash
+opencli external install bili
+opencli bili hot
+opencli bili video BV1ABcsztEcY --yaml
+```
 
 Register your own with `opencli external register <name>`; list everything with `opencli external list`.
 
@@ -212,6 +223,8 @@ OpenCLI supports downloading images, videos, and articles from supported platfor
 | **xiaoyuzhou** | Audio, Transcript | Downloads episode audio and transcript JSON/text with local credentials |
 | **zhihu** | Articles (Markdown) | Exports with optional image download |
 | **weixin** | Articles (Markdown) | WeChat Official Account articles |
+| **zsxq** | Topic pages (Markdown) | Export a single 知识星球 topic with comments and images |
+| **feishu** | Doc / Wiki pages (Markdown) | Export an opened Feishu/Lark document page from your logged-in browser |
 
 For video downloads, install `yt-dlp` first: `brew install yt-dlp`
 
@@ -224,6 +237,14 @@ opencli twitter download elonmusk --limit 20 --output ./twitter
 opencli 1688 download 841141931191 --output ./1688-downloads
 opencli xiaoyuzhou download 69b3b675772ac2295bfc01d0 --output ./xiaoyuzhou
 opencli xiaoyuzhou transcript 69dd0c98e2c8be31551f6a33 --output ./xiaoyuzhou-transcripts
+opencli zsxq download 123456789 --output ./zsxq
+opencli feishu doc --url "https://team.feishu.cn/docx/..." --output ./feishu
+opencli open "https://team.feishu.cn/docx/..."
+opencli open "https://wx.zsxq.com/topic/123456789"
+opencli open "https://www.reuters.com/world/..." --dry-run
+opencli open "https://movie.douban.com/subject/30382501/" --dry-run --explain
+opencli open "https://movie.douban.com/subject/30382501/" --candidates
+opencli open "https://movie.douban.com/subject/30382501/" --choose 1
 ```
 
 `opencli xiaoyuzhou download` and `transcript` require local Xiaoyuzhou credentials in `~/.opencli/xiaoyuzhou.json`.

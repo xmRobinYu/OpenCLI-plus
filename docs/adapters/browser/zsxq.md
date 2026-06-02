@@ -13,6 +13,7 @@ Read groups, topics, search results, dynamics, and single-topic details from [çŸ
 | `opencli zsxq topic <id>` | Fetch a single topic with comments |
 | `opencli zsxq search <keyword>` | Search topics inside a group |
 | `opencli zsxq dynamics` | List recent dynamics across groups |
+| `opencli zsxq download <target>` | Export one topic to Markdown with comments and images |
 
 ## Usage Examples
 
@@ -34,6 +35,12 @@ opencli zsxq topic 987654321 --comment_limit 20
 
 # Read recent dynamics across all joined groups
 opencli zsxq dynamics --limit 20
+
+# Export a topic to Markdown by topic id
+opencli zsxq download 987654321 --output ./zsxq
+
+# Export a topic directly from its wx.zsxq.com URL
+opencli zsxq download "https://wx.zsxq.com/topic/987654321" --output ./zsxq
 ```
 
 ## Prerequisites
@@ -47,3 +54,5 @@ opencli zsxq dynamics --limit 20
 - If there is no active group context, pass `--group_id <id>` or open the target group in Chrome first
 - `zsxq groups` returns `group_id`, which you can reuse with `--group_id`
 - `zsxq topic` surfaces a missing topic as `NOT_FOUND` instead of a generic fetch error
+- `zsxq download` uses the topic detail API directly, so it works with a bare `topic_id` and does not require `--group_id`
+- Markdown export writes to `<output>/<topic-title>/<topic-title>.md`; `--stdout` prints the markdown body directly for piping

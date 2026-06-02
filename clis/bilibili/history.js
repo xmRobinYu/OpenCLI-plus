@@ -1,5 +1,6 @@
 import { cli, Strategy } from '@jackwener/opencli/registry';
 import { apiGet, payloadData } from './utils.js';
+import { parseHistoryRows, runBiliJson } from './external-bridge.js';
 cli({
     site: 'bilibili',
     name: 'history',
@@ -9,10 +10,22 @@ cli({
     strategy: Strategy.COOKIE,
     args: [
         { name: 'limit', type: 'int', default: 20, help: 'Number of results' },
+        { name: 'backend', required: false, default: 'native', choices: ['native', 'bridge'], help: 'Data source backend: native browser API or bridged bili CLI' },
     ],
-    columns: ['rank', 'title', 'author', 'progress', 'url'],
+    columns: ['rank', 'title', 'author', 'progress', 'viewed_at', 'url'],
     func: async (page, kwargs) => {
         const { limit = 20 } = kwargs;
+        if (kwargs.backend === 'bridge') {
+            return parseHistoryRows(runBiliJson(['history']), Number(limit)).map((item) => ({
+                rank: item.rank,
+                title: item.title,
+                author: item.author,
+                progress: '',
+                viewed_at: item.viewed_at,
+                url: item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : '',
+                bvid: item.bvid,
+            }));
+        }
         const payload = await apiGet(page, '/x/web-interface/history/cursor', {
             params: { ps: Math.min(Number(limit), 30), type: 'archive' },
         });
@@ -33,6 +46,7 @@ cli({
                 title: item.title ?? '',
                 author: item.author_name ?? '',
                 progress: progressStr,
+                viewed_at: '',
                 url: item.history?.bvid ? `https://www.bilibili.com/video/${item.history.bvid}` : '',
             };
         });

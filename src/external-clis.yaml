@@ -37,6 +37,14 @@
   install:
     default: "npm install -g @larksuite/cli"
 
+- name: zsxq-cli
+  binary: zsxq-cli
+  description: "ZSXQ/知识星球 CLI — OAuth login, groups, topics, notes and API access for AI agents"
+  homepage: "https://github.com/unnoo/zsxq-skill"
+  tags: [zsxq, knowledge, community, export, ai-agent]
+  install:
+    default: "npm install -g zsxq-cli"
+
 - name: longbridge
   binary: longbridge
   description: "Longbridge CLI — AI-native market data, account management and trading commands for Longbridge OpenAPI"
@@ -45,6 +53,15 @@
   install:
     mac: "brew install --cask longbridge/tap/longbridge-terminal"
     windows: "scoop install https://open.longbridge.com/longbridge/longbridge-terminal/longbridge.json"
+
+- name: bili
+  binary: "bili"
+  package: "bilibili-cli"
+  description: "Bilibili CLI — browse videos, users, favorites, feed, interactions, subtitles and audio from the terminal"
+  homepage: "https://github.com/public-clis/bilibili-cli"
+  tags: [bilibili, video, subtitle, feed, favorites, ai-agent]
+  install:
+    default: "uv tool install bilibili-cli"
 
 - name: dws
   binary: dws

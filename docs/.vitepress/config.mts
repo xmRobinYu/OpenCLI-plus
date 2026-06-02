@@ -236,6 +236,8 @@ export default defineConfig({
               text: '适配器概览',
               items: [
                 { text: '所有适配器', link: '/zh/adapters/' },
+                { text: '飞书 / Lark 文档', link: '/zh/adapters/browser/feishu' },
+                { text: '知识星球 ZSXQ', link: '/zh/adapters/browser/zsxq' },
               ],
             },
           ],

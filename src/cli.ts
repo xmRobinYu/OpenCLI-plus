@@ -10,6 +10,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Command, InvalidArgumentError, Option } from 'commander';
+import yaml from 'js-yaml';
 import { findPackageRoot, getBuiltEntryCandidates } from './package-paths.js';
 import { type CliCommand, fullName, getRegistry, strategyLabel } from './registry.js';
 import { serializeCommand, formatArgSummary } from './serialization.js';
@@ -37,6 +38,7 @@ import { aliasForContextId, loadProfileConfig, renameProfile, resolveProfileCont
 import { formatDaemonVersion, isDaemonStale } from './browser/daemon-version.js';
 import type { BrowserDownloadWaitResult, IPage, ScreenshotOptions } from './types.js';
 import type { BrowserWindowMode } from './runtime.js';
+import { matchUrlToCommands, selectUrlRouteCandidate } from './url-routing.js';
 
 const CLI_FILE = fileURLToPath(import.meta.url);
 const BROWSER_TAB_OPTION_DESCRIPTION = 'Target tab/page identity returned by "browser open", "browser tab new", or "browser tab list"';
@@ -2776,6 +2778,49 @@ cli({
       const { runBrowserDoctor, renderBrowserDoctorReport } = await import('./doctor.js');
       const report = await runBrowserDoctor({ cliVersion: PKG_VERSION });
       console.log(renderBrowserDoctorReport(report));
+    });
+
+  program
+    .command('open')
+    .description('Route a URL to the most likely built-in adapter command')
+    .argument('<url>', 'Full URL to route')
+    .option('--dry-run', 'Only print the resolved route, do not execute')
+    .option('--explain', 'Print a short explanation of the selected route')
+    .option('--candidates', 'List candidate routes instead of executing the best match')
+    .option('--choose <index>', 'Choose one route from --candidates output (1-based)')
+    .option('-f, --format <fmt>', 'Output format for --dry-run: json or yaml', 'json')
+    .action(async (url: string, opts: { dryRun?: boolean; explain?: boolean; candidates?: boolean; choose?: string; format?: string }, command: Command) => {
+      const fmt = String(opts.format || 'json').toLowerCase();
+      if (opts.candidates) {
+        const candidates = matchUrlToCommands(url);
+        if (fmt === 'yaml' || fmt === 'yml') {
+          console.log(yaml.dump(candidates, { sortKeys: false, lineWidth: 120, noRefs: true }));
+        } else {
+          console.log(JSON.stringify(candidates, null, 2));
+        }
+        return;
+      }
+      const chooseIndex = opts.choose != null ? Number.parseInt(String(opts.choose), 10) : undefined;
+      const routed = selectUrlRouteCandidate(url, { index: chooseIndex });
+      if (opts.explain) {
+        console.log(`Routed to opencli ${routed.site} ${routed.command}: ${routed.reason}`);
+      }
+      if (opts.dryRun) {
+        if (fmt === 'yaml' || fmt === 'yml') {
+          console.log(yaml.dump(routed, { sortKeys: false, lineWidth: 120, noRefs: true }));
+        } else {
+          console.log(JSON.stringify(routed, null, 2));
+        }
+        return;
+      }
+      const extras = process.argv.slice(4);
+      const forwarded = [
+        routed.site,
+        routed.command,
+        ...routed.argv,
+        ...extras,
+      ];
+      await command.parent?.parseAsync(forwarded, { from: 'user' });
     });
 
   program

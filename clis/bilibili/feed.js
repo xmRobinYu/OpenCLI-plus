@@ -1,5 +1,7 @@
 import { cli, Strategy } from '@jackwener/opencli/registry';
+import { ArgumentError } from '@jackwener/opencli/errors';
 import { apiGet, payloadData, resolveUid, stripHtml } from './utils.js';
+import { parseFeedEnvelope, runBiliJson } from './external-bridge.js';
 
 /** Map bilibili dynamic type to readable short name */
 const TYPE_MAP = {
@@ -74,6 +76,8 @@ cli({
         { name: 'limit', type: 'int', default: 20, help: 'Max results to return' },
         { name: 'type', default: 'all', help: 'Filter: all, video, article, draw, text' },
         { name: 'pages', type: 'int', default: 1, help: 'Number of pages to fetch (each ~20 items)' },
+        { name: 'offset', help: 'Pagination cursor for the bridged bili feed backend' },
+        { name: 'backend', required: false, default: 'native', choices: ['native', 'bridge'], help: 'Data source backend: native browser API or bridged bili CLI' },
     ],
     columns: ['rank', 'time', 'author', 'title', 'type', 'likes', 'url'],
     func: async (page, kwargs) => {
@@ -81,11 +85,28 @@ cli({
         const maxPages = Number(kwargs.pages) || 1;
         const filterType = kwargs.type === 'all' ? '' : (kwargs.type ?? '');
 
+        if (kwargs.backend === 'bridge') {
+            if (kwargs.uid) {
+                throw new ArgumentError('bilibili feed --backend bridge does not support uid filtering yet');
+            }
+            if (filterType) {
+                throw new ArgumentError('bilibili feed --backend bridge does not support --type filtering yet');
+            }
+            if (maxPages !== 1) {
+                throw new ArgumentError('bilibili feed --backend bridge does not support --pages; use next_offset with --offset instead');
+            }
+            const cliArgs = ['feed'];
+            if (kwargs.offset) {
+                cliArgs.push('--offset', String(kwargs.offset));
+            }
+            return parseFeedEnvelope(runBiliJson(cliArgs), maxResults);
+        }
+
         const isUserFeed = !!kwargs.uid;
         const uid = isUserFeed ? await resolveUid(page, String(kwargs.uid)) : null;
 
         const rows = [];
-        let offset = '';
+        let offset = String(kwargs.offset || '');
 
         for (let p = 0; p < maxPages; p++) {
             if (rows.length >= maxResults) break;

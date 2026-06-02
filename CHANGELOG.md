@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Features
+
+* **feishu / zsxq** — add `feishu doc` and `zsxq download` Markdown export commands, plus Chinese adapter docs for both content-ingest flows.
+* **open** — add `opencli open <url>` with dry-run / explain / candidate listing, and built-in URL routing for Feishu, ZSXQ, Weixin, Zhihu, Reuters, YouTube, Bilibili, Quark, Douban, and Jike links.
+* **bilibili** — integrate `public-clis/bilibili-cli` into the unified `opencli bilibili ...` surface:
+  `status`, `whoami`, `user`, `favorites`, `watch-later`, `my-dynamics`, `dynamic-post`, and `dynamic-delete` are now bridged commands; `following`, `history`, and `feed` also support `--backend bridge`.
+
 ## [1.8.1](https://github.com/jackwener/opencli/compare/v1.8.0...v1.8.1) (2026-05-31)
 
 Patch release focused on the extension tab-group convergence fix, plus 10 new adapters/commands and a wave of read-path / security hardening across browser, download, and adapters.

@@ -8,6 +8,7 @@
 export { Page } from './page.js';
 export { BrowserBridge } from './bridge.js';
 export { CDPBridge } from './cdp.js';
+export { extractArticle, buildExtractArticleJs, DEFAULT_FALLBACK_SELECTORS } from './article-extract.js';
 export { getDaemonHealth } from './daemon-client.js';
 export type { DaemonHealth } from './daemon-client.js';
 export { generateSnapshotJs, scrollToRefJs, getFormStateJs } from './dom-snapshot.js';

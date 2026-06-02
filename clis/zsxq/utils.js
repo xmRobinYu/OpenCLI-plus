@@ -14,6 +14,180 @@ function pickArray(...values) {
     }
     return [];
 }
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+function parseRichAttrs(raw) {
+    const attrs = {};
+    String(raw || '').replace(/([:@\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g, (_match, key, dq, sq) => {
+        attrs[String(key).toLowerCase()] = dq ?? sq ?? '';
+        return '';
+    });
+    return attrs;
+}
+function decodeRichAttr(value) {
+    if (typeof value !== 'string')
+        return '';
+    try {
+        return decodeURIComponent(value);
+    }
+    catch {
+        return value;
+    }
+}
+function looksLikeBlockHtml(value) {
+    return /<(?:p|div|section|article|ul|ol|li|h[1-6]|blockquote|pre|table|img)\b/i.test(value);
+}
+function normalizeParagraphHtml(value) {
+    const normalized = String(value || '').replace(/\r\n?/g, '\n').trim();
+    if (!normalized)
+        return '';
+    if (looksLikeBlockHtml(normalized))
+        return normalized;
+    return normalized
+        .split(/\n{2,}/)
+        .map(chunk => chunk.trim())
+        .filter(Boolean)
+        .map(chunk => `<p>${chunk.replace(/\n/g, '<br />')}</p>`)
+        .join('\n');
+}
+function extractRichTextImageUrls(text) {
+    const urls = [];
+    String(text || '').replace(/<e\b([^>]*)>(.*?)<\/e>/gsi, (_match, attrsRaw) => {
+        const attrs = parseRichAttrs(attrsRaw);
+        if (String(attrs.type || '').toLowerCase() === 'image' && attrs.src) {
+            urls.push(decodeRichAttr(attrs.src));
+        }
+        return '';
+    });
+    return urls.filter(Boolean);
+}
+function richTextToHtml(text) {
+    if (typeof text !== 'string' || !text.trim())
+        return '';
+    const html = text.replace(/<e\b([^>]*)>(.*?)<\/e>/gsi, (_match, attrsRaw, innerText) => {
+        const attrs = parseRichAttrs(attrsRaw);
+        const type = String(attrs.type || '').toLowerCase();
+        if (type === 'mention') {
+            const title = decodeRichAttr(attrs.title || innerText || '');
+            return escapeHtml(title ? `@${title}` : '@');
+        }
+        if (type === 'hashtag') {
+            return escapeHtml(decodeRichAttr(attrs.title || innerText || ''));
+        }
+        if (type === 'web') {
+            const href = decodeRichAttr(attrs.href || '');
+            const title = decodeRichAttr(attrs.title || href || innerText || '');
+            return href
+                ? `<a href="${escapeHtml(href)}">${escapeHtml(title || href)}</a>`
+                : escapeHtml(title);
+        }
+        if (type === 'image') {
+            const src = decodeRichAttr(attrs.src || '');
+            const alt = decodeRichAttr(attrs.title || '图片');
+            return src ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" />` : '';
+        }
+        return escapeHtml(innerText || '');
+    });
+    const stripped = html
+        .replace(/<\/?e\b[^>]*>/gsi, '')
+        .replace(/<br\s*\/?>/gi, '\n');
+    return normalizeParagraphHtml(stripped);
+}
+function dedupeStrings(values) {
+    const seen = new Set();
+    const result = [];
+    for (const value of values) {
+        const normalized = String(value || '').trim();
+        if (!normalized || seen.has(normalized))
+            continue;
+        seen.add(normalized);
+        result.push(normalized);
+    }
+    return result;
+}
+function getPrimaryTopicBlock(topic) {
+    return topic.talk || topic.question || topic.task || topic.solution || topic.answer || {};
+}
+function collectTopicImageUrls(topic) {
+    const primary = getPrimaryTopicBlock(topic);
+    const apiImages = pickArray(primary.images)
+        .map((image) => image?.large?.url || image?.original?.url || image?.thumbnail?.url || image?.url || '')
+        .filter(Boolean);
+    const inlineImages = extractRichTextImageUrls(primary.text || '');
+    if (topic.answer?.text) {
+        inlineImages.push(...extractRichTextImageUrls(topic.answer.text));
+    }
+    return dedupeStrings([...apiImages, ...inlineImages]);
+}
+function getTopicTypeLabel(topicType) {
+    const mapping = {
+        talk: '帖子',
+        'q&a': '问答',
+        task: '作业',
+        solution: '作业答案',
+    };
+    return mapping[topicType] || topicType || '话题';
+}
+function commentToHtml(comment) {
+    const author = escapeHtml(comment?.owner?.name || '匿名');
+    const repliee = comment?.repliee?.name ? ` 回复 ${escapeHtml(comment.repliee.name)}` : '';
+    const body = richTextToHtml(comment?.text || '') || '<p></p>';
+    return `<li><strong>${author}${repliee}</strong>${body}</li>`;
+}
+function buildAttachmentSection(files) {
+    const items = pickArray(files)
+        .map((file) => {
+        const name = file?.name || file?.file_name || '附件';
+        const url = file?.url || file?.download_url || '';
+        return url
+            ? `<li><a href="${escapeHtml(url)}">${escapeHtml(name)}</a></li>`
+            : `<li>${escapeHtml(name)}</li>`;
+    })
+        .join('');
+    return items ? `<h2>附件</h2><ul>${items}</ul>` : '';
+}
+export function parseTopicTarget(raw) {
+    const value = String(raw || '').trim();
+    if (!value) {
+        throw new ArgumentError('Topic target is required', 'Pass a numeric topic id or a wx.zsxq.com/topic/<id> URL');
+    }
+    if (/^\d+$/.test(value)) {
+        return { topicId: value };
+    }
+    const topicUrlMatch = value.match(/\/topic\/(\d+)/i);
+    if (topicUrlMatch) {
+        return { topicId: topicUrlMatch[1] };
+    }
+    throw new ArgumentError(`Unsupported topic target: ${value}`, 'Pass a numeric topic id or a wx.zsxq.com/topic/<id> URL');
+}
+export function topicToArticleData(topic, comments = [], sourceUrl = '') {
+    const primary = getPrimaryTopicBlock(topic);
+    const title = getTopicText(topic) || `zsxq-topic-${topic?.topic_id || 'untitled'}`;
+    const bodyHtml = richTextToHtml(primary?.text || '');
+    const extraImageHtml = pickArray(primary?.images)
+        .map((image) => image?.large?.url || image?.original?.url || image?.thumbnail?.url || image?.url || '')
+        .filter(Boolean)
+        .map((url) => `<p><img src="${escapeHtml(url)}" alt="图片" /></p>`)
+        .join('');
+    const answerHtml = topic?.answer?.text ? `<h2>回答</h2>${richTextToHtml(topic.answer.text)}` : '';
+    const attachmentsHtml = buildAttachmentSection(primary?.files);
+    const commentsHtml = comments.length > 0 ? `<h2>评论</h2><ul>${comments.map(commentToHtml).join('')}</ul>` : '';
+    const metricsHtml = `<blockquote><p>类型: ${escapeHtml(getTopicTypeLabel(topic?.type || ''))}</p><p>阅读: ${escapeHtml(topic?.readers_count ?? topic?.reading_count ?? 0)} / 点赞: ${escapeHtml(topic?.likes_count ?? 0)} / 评论: ${escapeHtml(topic?.comments_count ?? comments.length ?? 0)}</p></blockquote>`;
+    return {
+        title,
+        author: getTopicAuthor(topic) || primary?.owner?.name || '',
+        publishTime: String(topic?.create_time || '').replace('T', ' ').replace(/\.\d+Z$/, '').trim(),
+        sourceUrl,
+        contentHtml: [metricsHtml, bodyHtml, extraImageHtml, attachmentsHtml, answerHtml, commentsHtml].filter(Boolean).join('\n'),
+        imageUrls: collectTopicImageUrls(topic),
+    };
+}
 export async function ensureZsxqPage(page) {
     await page.goto(SITE_URL);
 }

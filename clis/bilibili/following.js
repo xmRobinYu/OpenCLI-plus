@@ -1,6 +1,7 @@
 import { cli, Strategy } from '@jackwener/opencli/registry';
 import { CommandExecutionError } from '@jackwener/opencli/errors';
 import { fetchJson, getSelfUid, resolveUid } from './utils.js';
+import { parseFollowingRows, runBiliJson } from './external-bridge.js';
 cli({
     site: 'bilibili',
     name: 'following',
@@ -12,9 +13,19 @@ cli({
         { name: 'uid', positional: true, required: false, help: '目标用户 ID（默认为当前登录用户）' },
         { name: 'page', type: 'int', required: false, default: 1, help: '页码' },
         { name: 'limit', type: 'int', required: false, default: 50, help: '每页数量 (最大 50)' },
+        { name: 'backend', required: false, default: 'native', choices: ['native', 'bridge'], help: 'Data source backend: native browser API or bridged bili CLI' },
     ],
     columns: ['mid', 'name', 'sign', 'following', 'fans'],
     func: async (page, kwargs) => {
+        if (kwargs.backend === 'bridge') {
+            return parseFollowingRows(runBiliJson(['following'])).map((item) => ({
+                mid: item.id,
+                name: item.name,
+                sign: item.sign,
+                following: '',
+                fans: '',
+            }));
+        }
         if (!page)
             throw new CommandExecutionError('Browser session required for bilibili following');
         // 1. Resolve UID (default to self)

@@ -13,6 +13,22 @@ const WEB_API = `${WEREAD_WEB_ORIGIN}/web`;
 const API = `https://i.${WEREAD_DOMAIN}`;
 export const WEREAD_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const WEREAD_AUTH_ERRCODES = new Set([-2010, -2012]);
+export function parseWereadReaderUrl(raw) {
+    const value = String(raw || '').trim();
+    if (!/^https?:\/\//i.test(value))
+        return '';
+    let parsed;
+    try {
+        parsed = new URL(value);
+    }
+    catch {
+        return '';
+    }
+    if (parsed.hostname !== WEREAD_DOMAIN)
+        return '';
+    const match = parsed.pathname.match(/^\/web\/reader\/([^/?#]+)$/i);
+    return match ? `${WEREAD_WEB_ORIGIN}/web/reader/${match[1]}` : '';
+}
 function buildCookieHeader(cookies) {
     return cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
 }

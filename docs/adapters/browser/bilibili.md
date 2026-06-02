@@ -9,8 +9,19 @@
 | `opencli bilibili hot` | |
 | `opencli bilibili search` | |
 | `opencli bilibili me` | |
+| `opencli bilibili status` | Check current login status via `bili status` |
+| `opencli bilibili whoami` | Read detailed account info via `bili whoami` |
+| `opencli bilibili user <uid-or-name>` | Read a specific UP profile via `bili user` |
 | `opencli bilibili favorite` | Read your first favorite folder, or a specific folder with `--fid` |
+| `opencli bilibili favorites` | List favorite folders via `bili favorites` |
 | `opencli bilibili history` | |
+| `opencli bilibili watch-later` | Read watch-later items via `bili watch-later` |
+| `opencli bilibili following-bridge` | Compatibility shim for `bilibili following --backend bridge` |
+| `opencli bilibili history-bridge` | Compatibility shim for `bilibili history --backend bridge` |
+| `opencli bilibili feed-bridge` | Compatibility shim for `bilibili feed --backend bridge` |
+| `opencli bilibili my-dynamics` | Read your own dynamics via `bili my-dynamics`, preserving `next_offset` |
+| `opencli bilibili dynamic-post` | Publish a text dynamic via `bili dynamic-post` |
+| `opencli bilibili dynamic-delete` | Delete a dynamic via `bili dynamic-delete` |
 | `opencli bilibili feed` | Read the following feed, or a specific user's dynamics by uid/name |
 | `opencli bilibili feed-detail` | Read one dynamic in detail, including exclusive content |
 | `opencli bilibili subtitle` | |
@@ -33,17 +44,59 @@ opencli bilibili hot --limit 5
 # Search videos
 opencli bilibili search 黑神话 --limit 10
 
+# Check login status through bilibili-cli bridge
+opencli bilibili status
+
+# Read a specific UP profile through bilibili-cli bridge
+opencli bilibili user 老番茄
+
 # Read one creator's videos
 opencli bilibili user-videos 2 --limit 10
 
 # Read your first favorite folder
 opencli bilibili favorite --limit 10
 
+# List favorite folders through bilibili-cli bridge
+opencli bilibili favorites
+
+# Read detailed account info through bilibili-cli bridge
+opencli bilibili whoami
+
+# Read watch-later list through bilibili-cli bridge
+opencli bilibili watch-later --limit 20
+
+# Read following list through the unified command name + bridge backend
+opencli bilibili following --backend bridge
+
+# Read watch history through the unified command name + bridge backend
+opencli bilibili history --backend bridge --limit 20
+
+# Read timeline through the unified command name + bridge backend (JSON keeps next_offset)
+opencli bilibili feed --backend bridge -f json
+opencli bilibili feed --backend bridge --offset "<cursor>" -f json
+
+# Read my own dynamics through bilibili-cli bridge
+opencli bilibili my-dynamics
+opencli bilibili my-dynamics --offset 123456
+
+# Legacy compatibility shims still work
+opencli bilibili following-bridge
+opencli bilibili history-bridge --limit 20
+opencli bilibili feed-bridge --offset "<cursor>"
+
+# Write commands still require --execute
+opencli bilibili dynamic-post "这是一条来自 OpenCLI 的动态" --execute
+opencli bilibili dynamic-delete 123456789 --execute
+
 # Read a specific favorite folder
 opencli bilibili favorite --fid 123456789 --limit 10
 
 # Read following feed
 opencli bilibili feed --limit 10
+
+# Use the bridged bili feed backend and keep next_offset
+opencli bilibili feed --backend bridge -f json
+opencli bilibili feed --backend bridge --offset "<cursor>" -f json
 
 # Read one user's dynamics by UID
 opencli bilibili feed 2 --limit 10
@@ -90,6 +143,16 @@ opencli bilibili hot -v
 - `opencli bilibili feed` without `uid` reads your following feed
 - `opencli bilibili feed <uid-or-name>` reads a specific user's dynamics
 - `opencli bilibili favorite` defaults to the first favorite folder when `--fid` is omitted
+- `opencli bilibili status`, `whoami`, `user`, `favorites`, `watch-later`, `following-bridge`, `history-bridge`, `feed-bridge`, `my-dynamics`, `dynamic-post`, and `dynamic-delete` are bridged through the external `bili` tool from `public-clis/bilibili-cli`
+- Install that bridge backend with `opencli external install bili`
+- Prefer `opencli bilibili ...` as the unified user-facing entrypoint; `opencli bili ...` remains available as the raw passthrough surface
+- `opencli bilibili following --backend bridge` reuses the same bridge under the canonical command name
+- `opencli bilibili history --backend bridge` reuses the same bridge under the canonical command name
+- `opencli bilibili feed --backend bridge` reuses the same bridge under the canonical command name and preserves `next_offset`
+- `following-bridge`, `history-bridge`, and `feed-bridge` are compatibility shims; prefer the canonical command names above
+- The bridged feed currently does not support `uid`, `type`, or `pages`; use `offset` for pagination instead
+- `feed-bridge` defaults to JSON output so the pagination cursor `next_offset` stays available without lossy table formatting
+- `dynamic-post` and `dynamic-delete` are write commands; like other OpenCLI writes, they refuse to run unless `--execute` is passed
 - `feed-detail` expects the dynamic ID from a `https://t.bilibili.com/<id>` URL
 - `comments` emits `rpid`; pass a top-level row's `rpid` to `comments --parent` to read its reply thread
 - `comments --limit` accepts `1..50`; empty comment lists raise `EmptyResultError`

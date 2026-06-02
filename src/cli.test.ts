@@ -616,6 +616,100 @@ describe('createProgram root help descriptions', () => {
   });
 });
 
+describe('open URL routing', () => {
+  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+  beforeEach(() => {
+    logSpy.mockClear();
+  });
+
+  it('routes a Feishu URL through the open command into the feishu adapter', async () => {
+    const registry = getRegistry();
+    const snapshot = new Map(registry);
+    registry.clear();
+    try {
+      const fn = vi.fn().mockResolvedValue([{ title: 'ok' }]);
+      cli({
+        site: 'feishu',
+        name: 'doc',
+        access: 'read',
+        description: 'Export Feishu doc',
+        strategy: Strategy.PUBLIC,
+        browser: false,
+        args: [{ name: 'url', required: true, help: 'Document URL' }],
+        func: fn,
+      });
+      const program = createProgram('', '');
+      await program.parseAsync(['open', 'https://team.feishu.cn/docx/abc'], { from: 'user' });
+      expect(fn).toHaveBeenCalledWith(expect.objectContaining({ url: 'https://team.feishu.cn/docx/abc' }), false);
+    } finally {
+      registry.clear();
+      for (const [key, value] of snapshot) registry.set(key, value);
+    }
+  });
+
+  it('supports dry-run mode for URL routing', async () => {
+    const program = createProgram('', '');
+    await program.parseAsync(['open', 'https://team.feishu.cn/docx/abc', '--dry-run'], { from: 'user' });
+    const output = logSpy.mock.calls.map((call) => String(call[0])).join('');
+    expect(output).toContain('"site": "feishu"');
+    expect(output).toContain('"command": "doc"');
+  });
+
+  it('supports yaml dry-run output for URL routing', async () => {
+    const program = createProgram('', '');
+    await program.parseAsync(['open', 'https://www.reuters.com/world/example-story/', '--dry-run', '-f', 'yaml'], { from: 'user' });
+    const output = logSpy.mock.calls.map((call) => String(call[0])).join('');
+    expect(output).toContain('site: reuters');
+    expect(output).toContain('command: article-detail');
+  });
+
+  it('supports explain mode for URL routing', async () => {
+    const program = createProgram('', '');
+    await program.parseAsync(['open', 'https://movie.douban.com/subject/30382501/', '--dry-run', '--explain'], { from: 'user' });
+    const output = logSpy.mock.calls.map((call) => String(call[0])).join('\n');
+    expect(output).toContain('Routed to opencli douban subject');
+    expect(output).toContain('"site": "douban"');
+  });
+
+  it('supports candidate listing for URL routing', async () => {
+    const program = createProgram('', '');
+    await program.parseAsync(['open', 'https://movie.douban.com/subject/30382501/', '--candidates'], { from: 'user' });
+    const output = logSpy.mock.calls.map((call) => String(call[0])).join('\n');
+    expect(output).toContain('"site": "douban"');
+    expect(output).toContain('"command": "subject"');
+    expect(output).toContain('"confidence": "high"');
+  });
+
+  it('accepts --choose even when only one candidate exists', async () => {
+    const registry = getRegistry();
+    const snapshot = new Map(registry);
+    registry.clear();
+    try {
+      const fn = vi.fn().mockResolvedValue([{ title: 'ok' }]);
+      cli({
+        site: 'douban',
+        name: 'subject',
+        access: 'read',
+        description: 'Douban subject',
+        strategy: Strategy.PUBLIC,
+        browser: false,
+        args: [
+          { name: 'id', required: true, positional: true, help: 'Subject id' },
+          { name: 'type', required: true, help: 'Subject type' },
+        ],
+        func: fn,
+      });
+      const program = createProgram('', '');
+      await program.parseAsync(['open', 'https://movie.douban.com/subject/30382501/', '--choose', '1'], { from: 'user' });
+      expect(fn).toHaveBeenCalledWith(expect.objectContaining({ id: '30382501', type: 'movie' }), false);
+    } finally {
+      registry.clear();
+      for (const [key, value] of snapshot) registry.set(key, value);
+    }
+  });
+});
+
 describe('resolveBrowserVerifyInvocation', () => {
   it('prefers the built entry declared in package metadata', () => {
     const projectRoot = path.join('repo-root');

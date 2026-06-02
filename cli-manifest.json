@@ -3165,6 +3165,70 @@
   },
   {
     "site": "bilibili",
+    "name": "dynamic-delete",
+    "description": "通过 bilibili-cli 删除一条动态",
+    "access": "write",
+    "strategy": "local",
+    "browser": false,
+    "args": [
+      {
+        "name": "id",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Dynamic ID"
+      },
+      {
+        "name": "execute",
+        "type": "boolean",
+        "required": false,
+        "help": "Actually delete the dynamic"
+      }
+    ],
+    "columns": [
+      "success",
+      "action",
+      "dynamic_id",
+      "text"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/dynamic-delete.js",
+    "sourceFile": "bilibili/dynamic-delete.js"
+  },
+  {
+    "site": "bilibili",
+    "name": "dynamic-post",
+    "description": "通过 bilibili-cli 发布纯文本动态",
+    "access": "write",
+    "strategy": "local",
+    "browser": false,
+    "args": [
+      {
+        "name": "text",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Dynamic text content"
+      },
+      {
+        "name": "execute",
+        "type": "boolean",
+        "required": false,
+        "help": "Actually publish the dynamic"
+      }
+    ],
+    "columns": [
+      "success",
+      "action",
+      "dynamic_id",
+      "text"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/dynamic-post.js",
+    "sourceFile": "bilibili/dynamic-post.js"
+  },
+  {
+    "site": "bilibili",
     "name": "favorite",
     "description": "我的收藏夹",
     "access": "write",
@@ -3207,6 +3271,23 @@
   },
   {
     "site": "bilibili",
+    "name": "favorites",
+    "description": "通过 bilibili-cli 列出当前账号的收藏夹列表",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [],
+    "columns": [
+      "id",
+      "title",
+      "media_count"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/favorites.js",
+    "sourceFile": "bilibili/favorites.js"
+  },
+  {
+    "site": "bilibili",
     "name": "feed",
     "description": "动态时间线（不传 uid 查关注时间线，传 uid 查指定用户动态）",
     "access": "read",
@@ -3241,6 +3322,23 @@
         "default": 1,
         "required": false,
         "help": "Number of pages to fetch (each ~20 items)"
+      },
+      {
+        "name": "offset",
+        "type": "str",
+        "required": false,
+        "help": "Pagination cursor for the bridged bili feed backend"
+      },
+      {
+        "name": "backend",
+        "type": "str",
+        "default": "native",
+        "required": false,
+        "help": "Data source backend: native browser API or bridged bili CLI",
+        "choices": [
+          "native",
+          "bridge"
+        ]
       }
     ],
     "columns": [
@@ -3256,6 +3354,33 @@
     "modulePath": "bilibili/feed.js",
     "sourceFile": "bilibili/feed.js",
     "navigateBefore": "https://www.bilibili.com"
+  },
+  {
+    "site": "bilibili",
+    "name": "feed-bridge",
+    "description": "通过 bilibili-cli 读取动态时间线",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [
+      {
+        "name": "offset",
+        "type": "str",
+        "required": false,
+        "help": "Pagination cursor returned by a previous feed-bridge call"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Maximum items to return from the current page"
+      }
+    ],
+    "defaultFormat": "json",
+    "type": "js",
+    "modulePath": "bilibili/feed-bridge.js",
+    "sourceFile": "bilibili/feed-bridge.js"
   },
   {
     "site": "bilibili",
@@ -3312,6 +3437,17 @@
         "default": 50,
         "required": false,
         "help": "每页数量 (最大 50)"
+      },
+      {
+        "name": "backend",
+        "type": "str",
+        "default": "native",
+        "required": false,
+        "help": "Data source backend: native browser API or bridged bili CLI",
+        "choices": [
+          "native",
+          "bridge"
+        ]
       }
     ],
     "columns": [
@@ -3328,6 +3464,23 @@
   },
   {
     "site": "bilibili",
+    "name": "following-bridge",
+    "description": "通过 bilibili-cli 读取当前账号的关注列表",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [],
+    "columns": [
+      "id",
+      "name",
+      "sign"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/following-bridge.js",
+    "sourceFile": "bilibili/following-bridge.js"
+  },
+  {
+    "site": "bilibili",
     "name": "history",
     "description": "我的观看历史",
     "access": "read",
@@ -3341,6 +3494,17 @@
         "default": 20,
         "required": false,
         "help": "Number of results"
+      },
+      {
+        "name": "backend",
+        "type": "str",
+        "default": "native",
+        "required": false,
+        "help": "Data source backend: native browser API or bridged bili CLI",
+        "choices": [
+          "native",
+          "bridge"
+        ]
       }
     ],
     "columns": [
@@ -3348,12 +3512,40 @@
       "title",
       "author",
       "progress",
+      "viewed_at",
       "url"
     ],
     "type": "js",
     "modulePath": "bilibili/history.js",
     "sourceFile": "bilibili/history.js",
     "navigateBefore": "https://www.bilibili.com"
+  },
+  {
+    "site": "bilibili",
+    "name": "history-bridge",
+    "description": "通过 bilibili-cli 读取观看历史",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 30,
+        "required": false,
+        "help": "Maximum items to return"
+      }
+    ],
+    "columns": [
+      "rank",
+      "bvid",
+      "title",
+      "author",
+      "viewed_at"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/history-bridge.js",
+    "sourceFile": "bilibili/history-bridge.js"
   },
   {
     "site": "bilibili",
@@ -3407,6 +3599,34 @@
     "modulePath": "bilibili/me.js",
     "sourceFile": "bilibili/me.js",
     "navigateBefore": "https://www.bilibili.com"
+  },
+  {
+    "site": "bilibili",
+    "name": "my-dynamics",
+    "description": "通过 bilibili-cli 读取我发布的动态",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [
+      {
+        "name": "offset",
+        "type": "int",
+        "default": 0,
+        "required": false,
+        "help": "Pagination offset returned by a previous my-dynamics call"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Maximum items to return from the current page"
+      }
+    ],
+    "defaultFormat": "json",
+    "type": "js",
+    "modulePath": "bilibili/my-dynamics.js",
+    "sourceFile": "bilibili/my-dynamics.js"
   },
   {
     "site": "bilibili",
@@ -3489,6 +3709,25 @@
   },
   {
     "site": "bilibili",
+    "name": "status",
+    "description": "通过 bilibili-cli 检查当前 B 站登录状态",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [],
+    "columns": [
+      "authenticated",
+      "name",
+      "uid",
+      "level",
+      "message"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/status.js",
+    "sourceFile": "bilibili/status.js"
+  },
+  {
+    "site": "bilibili",
     "name": "subtitle",
     "description": "获取 Bilibili 视频的字幕",
     "access": "read",
@@ -3546,6 +3785,35 @@
     "modulePath": "bilibili/summary.js",
     "sourceFile": "bilibili/summary.js",
     "navigateBefore": "https://www.bilibili.com"
+  },
+  {
+    "site": "bilibili",
+    "name": "user",
+    "description": "通过 bilibili-cli 读取指定 UP 主资料",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [
+      {
+        "name": "uid_or_name",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "UID or username"
+      }
+    ],
+    "columns": [
+      "name",
+      "uid",
+      "level",
+      "coins",
+      "followers",
+      "following",
+      "sign"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/user.js",
+    "sourceFile": "bilibili/user.js"
   },
   {
     "site": "bilibili",
@@ -3622,6 +3890,54 @@
     "modulePath": "bilibili/video.js",
     "sourceFile": "bilibili/video.js",
     "navigateBefore": true
+  },
+  {
+    "site": "bilibili",
+    "name": "watch-later",
+    "description": "通过 bilibili-cli 读取稍后再看列表",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 30,
+        "required": false,
+        "help": "Maximum items to return"
+      }
+    ],
+    "columns": [
+      "rank",
+      "bvid",
+      "title",
+      "author",
+      "duration"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/watch-later.js",
+    "sourceFile": "bilibili/watch-later.js"
+  },
+  {
+    "site": "bilibili",
+    "name": "whoami",
+    "description": "通过 bilibili-cli 读取当前登录账号的详细信息",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [],
+    "columns": [
+      "name",
+      "uid",
+      "level",
+      "coins",
+      "followers",
+      "following",
+      "sign"
+    ],
+    "type": "js",
+    "modulePath": "bilibili/whoami.js",
+    "sourceFile": "bilibili/whoami.js"
   },
   {
     "site": "binance",
@@ -11673,6 +11989,63 @@
     "modulePath": "facebook/search.js",
     "sourceFile": "facebook/search.js",
     "navigateBefore": "https://www.facebook.com"
+  },
+  {
+    "site": "feishu",
+    "name": "doc",
+    "description": "导出飞书文档页面为 Markdown",
+    "access": "read",
+    "domain": "feishu.cn",
+    "strategy": "cookie",
+    "browser": true,
+    "args": [
+      {
+        "name": "url",
+        "type": "str",
+        "required": true,
+        "help": "Feishu/Lark doc or wiki page URL"
+      },
+      {
+        "name": "output",
+        "type": "str",
+        "default": "./feishu-docs",
+        "required": false,
+        "help": "Output directory"
+      },
+      {
+        "name": "download-images",
+        "type": "boolean",
+        "default": true,
+        "required": false,
+        "help": "Download images locally"
+      },
+      {
+        "name": "stdout",
+        "type": "boolean",
+        "default": false,
+        "required": false,
+        "help": "Print markdown to stdout instead of saving a file"
+      },
+      {
+        "name": "wait",
+        "type": "int",
+        "default": 3,
+        "required": false,
+        "help": "Seconds to wait after navigation"
+      }
+    ],
+    "columns": [
+      "title",
+      "author",
+      "publish_time",
+      "status",
+      "size",
+      "saved"
+    ],
+    "type": "js",
+    "modulePath": "feishu/doc.js",
+    "sourceFile": "feishu/doc.js",
+    "navigateBefore": false
   },
   {
     "site": "flathub",
@@ -36948,6 +37321,64 @@
     "modulePath": "zlibrary/search.js",
     "sourceFile": "zlibrary/search.js",
     "navigateBefore": false
+  },
+  {
+    "site": "zsxq",
+    "name": "download",
+    "description": "导出知识星球话题为 Markdown",
+    "access": "read",
+    "domain": "wx.zsxq.com",
+    "strategy": "cookie",
+    "browser": true,
+    "args": [
+      {
+        "name": "target",
+        "type": "str",
+        "required": true,
+        "positional": true,
+        "help": "Topic ID or wx.zsxq.com/topic/<id> URL"
+      },
+      {
+        "name": "output",
+        "type": "str",
+        "default": "./zsxq-articles",
+        "required": false,
+        "help": "Output directory"
+      },
+      {
+        "name": "download-images",
+        "type": "boolean",
+        "default": true,
+        "required": false,
+        "help": "Download images locally"
+      },
+      {
+        "name": "stdout",
+        "type": "boolean",
+        "default": false,
+        "required": false,
+        "help": "Print markdown to stdout instead of saving a file"
+      },
+      {
+        "name": "comment_limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Maximum comments to include"
+      }
+    ],
+    "columns": [
+      "title",
+      "author",
+      "publish_time",
+      "status",
+      "size",
+      "saved"
+    ],
+    "type": "js",
+    "modulePath": "zsxq/download.js",
+    "sourceFile": "zsxq/download.js",
+    "navigateBefore": "https://wx.zsxq.com"
   },
   {
     "site": "zsxq",

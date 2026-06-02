@@ -37342,6 +37342,35 @@
   },
   {
     "site": "zsxq",
+    "name": "footprints",
+    "description": "通过 zsxq-cli 查看当前账号跨星球发帖足迹",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [
+      {
+        "name": "limit",
+        "type": "int",
+        "default": 20,
+        "required": false,
+        "help": "Maximum items to return"
+      }
+    ],
+    "columns": [
+      "rank",
+      "group_id",
+      "group_name",
+      "topic_id",
+      "title",
+      "time",
+      "url"
+    ],
+    "type": "js",
+    "modulePath": "zsxq/footprints.js",
+    "sourceFile": "zsxq/footprints.js"
+  },
+  {
+    "site": "zsxq",
     "name": "groups",
     "description": "列出当前账号加入的星球",
     "access": "read",
@@ -37415,6 +37444,24 @@
     "modulePath": "zsxq/search.js",
     "sourceFile": "zsxq/search.js",
     "navigateBefore": "https://wx.zsxq.com"
+  },
+  {
+    "site": "zsxq",
+    "name": "status",
+    "description": "通过 zsxq-cli 检查当前知识星球登录状态",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [],
+    "columns": [
+      "authenticated",
+      "user_id",
+      "name",
+      "message"
+    ],
+    "type": "js",
+    "modulePath": "zsxq/status.js",
+    "sourceFile": "zsxq/status.js"
   },
   {
     "site": "zsxq",
@@ -37498,5 +37545,23 @@
     "modulePath": "zsxq/topics.js",
     "sourceFile": "zsxq/topics.js",
     "navigateBefore": "https://wx.zsxq.com"
+  },
+  {
+    "site": "zsxq",
+    "name": "user",
+    "description": "通过 zsxq-cli 读取当前知识星球账号资料",
+    "access": "read",
+    "strategy": "local",
+    "browser": false,
+    "args": [],
+    "columns": [
+      "user_id",
+      "name",
+      "avatar_url",
+      "certified"
+    ],
+    "type": "js",
+    "modulePath": "zsxq/user.js",
+    "sourceFile": "zsxq/user.js"
   }
 ]

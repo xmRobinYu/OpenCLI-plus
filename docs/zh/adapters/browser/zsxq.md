@@ -13,6 +13,9 @@
 | `opencli zsxq topic <id>` | 读取单条话题详情和评论 |
 | `opencli zsxq search <keyword>` | 在星球内搜索话题 |
 | `opencli zsxq dynamics` | 列出跨星球的最近动态 |
+| `opencli zsxq status` | 通过 `zsxq-cli auth status` 查看当前登录状态 |
+| `opencli zsxq user` | 通过 `zsxq-cli user +info` 查看当前账号资料 |
+| `opencli zsxq footprints` | 通过 `zsxq-cli user +footprints` 查看跨星球发帖足迹 |
 | `opencli zsxq download <target>` | 导出单条话题为 Markdown，包含评论和图片 |
 
 ## 使用示例
@@ -29,6 +32,13 @@ opencli zsxq search "opencli"
 
 # 在指定星球中搜索
 opencli zsxq search "opencli" --group_id 123456789
+
+# 查看登录状态 / 当前账号资料
+opencli zsxq status
+opencli zsxq user
+
+# 查看跨星球发帖足迹
+opencli zsxq footprints --limit 20
 
 # 读取单条话题详情
 opencli zsxq topic 987654321 --comment_limit 20
@@ -56,3 +66,4 @@ opencli zsxq download "https://wx.zsxq.com/topic/987654321" --output ./zsxq
 - `zsxq topic` 在目标不存在时会返回 `NOT_FOUND`，而不是通用抓取错误。
 - `zsxq download` 直接使用话题详情接口，所以只传 `topic_id` 也能工作，不依赖 `group_id`。
 - Markdown 导出默认写入 `<output>/<topic-title>/<topic-title>.md`；传 `--stdout` 时会直接输出 Markdown 正文，适合管道处理。
+- `zsxq status`、`user`、`footprints` 通过官方 `zsxq-cli` 桥接，使用前可先执行 `opencli external install zsxq-cli`。

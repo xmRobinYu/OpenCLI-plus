@@ -13,6 +13,9 @@ Read groups, topics, search results, dynamics, and single-topic details from [çŸ
 | `opencli zsxq topic <id>` | Fetch a single topic with comments |
 | `opencli zsxq search <keyword>` | Search topics inside a group |
 | `opencli zsxq dynamics` | List recent dynamics across groups |
+| `opencli zsxq status` | Check current login status via `zsxq-cli auth status` |
+| `opencli zsxq user` | Read current user profile via `zsxq-cli user +info` |
+| `opencli zsxq footprints` | Read cross-group posting footprints via `zsxq-cli user +footprints` |
 | `opencli zsxq download <target>` | Export one topic to Markdown with comments and images |
 
 ## Usage Examples
@@ -29,6 +32,13 @@ opencli zsxq search "opencli"
 
 # Search inside a specific group explicitly
 opencli zsxq search "opencli" --group_id 123456789
+
+# Check login status / current user profile via zsxq-cli bridge
+opencli zsxq status
+opencli zsxq user
+
+# Read my cross-group posting footprints
+opencli zsxq footprints --limit 20
 
 # Export a single topic with comments
 opencli zsxq topic 987654321 --comment_limit 20
@@ -56,3 +66,4 @@ opencli zsxq download "https://wx.zsxq.com/topic/987654321" --output ./zsxq
 - `zsxq topic` surfaces a missing topic as `NOT_FOUND` instead of a generic fetch error
 - `zsxq download` uses the topic detail API directly, so it works with a bare `topic_id` and does not require `--group_id`
 - Markdown export writes to `<output>/<topic-title>/<topic-title>.md`; `--stdout` prints the markdown body directly for piping
+- `zsxq status`, `user`, and `footprints` are bridged through the official `zsxq-cli`; install it with `opencli external install zsxq-cli`

@@ -7,7 +7,7 @@
 * **feishu / zsxq** — add `feishu doc` and `zsxq download` Markdown export commands, plus Chinese adapter docs for both content-ingest flows.
 * **open** — add `opencli open <url>` with dry-run / explain / candidate listing, and built-in URL routing for Feishu, ZSXQ, Weixin, Zhihu, Reuters, YouTube, Bilibili, Quark, Douban, and Jike links.
 * **bilibili** — integrate `public-clis/bilibili-cli` into the unified `opencli bilibili ...` surface:
-  `status`, `whoami`, `user`, `favorites`, `watch-later`, `my-dynamics`, `dynamic-post`, and `dynamic-delete` are now bridged commands; `following`, `history`, and `feed` also support `--backend bridge`.
+  `status`, `whoami`, `user`, `favorites`, `watch-later`, `my-dynamics`, `dynamic-post`, and `dynamic-delete` are now bridged commands; `following`, `history`, and `feed` also support `--backend bridge`. The temporary `following-bridge`, `history-bridge`, and `feed-bridge` shim commands have been removed so the user-facing command surface converges on the canonical `opencli bilibili ...` names.
 
 ## [1.8.1](https://github.com/jackwener/opencli/compare/v1.8.0...v1.8.1) (2026-05-31)
 

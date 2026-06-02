@@ -16,9 +16,9 @@ import './whoami.js';
 import './user.js';
 import './favorites.js';
 import './watch-later.js';
-import './following-bridge.js';
-import './history-bridge.js';
-import './feed-bridge.js';
+import './following.js';
+import './history.js';
+import './feed.js';
 import './my-dynamics.js';
 import './dynamic-post.js';
 import './dynamic-delete.js';
@@ -302,44 +302,6 @@ describe('bilibili bridged commands', () => {
         expect(rows).toEqual([{ rank: 1, bvid: 'BV1', title: '视频1', author: 'UP1', duration: '10:20' }]);
     });
 
-    it('bridges bilibili following through bili --json', async () => {
-        mockExecFileSync.mockReturnValue(JSON.stringify({
-            ok: true,
-            data: { items: [{ id: '1', name: 'UP1', sign: '签名1' }] },
-        }));
-        const command = getRegistry().get('bilibili/following-bridge');
-        const rows = await command.func({}, false);
-        expect(mockExecFileSync).toHaveBeenCalledWith('bili', ['following', '--json'], expect.any(Object));
-        expect(rows).toEqual([{ id: '1', name: 'UP1', sign: '签名1' }]);
-    });
-
-    it('bridges bilibili history through bili --json', async () => {
-        mockExecFileSync.mockReturnValue(JSON.stringify({
-            ok: true,
-            data: { items: [{ bvid: 'BV1', title: '视频1', author: 'UP1', viewed_at: '2026-06-02T10:00:00' }] },
-        }));
-        const command = getRegistry().get('bilibili/history-bridge');
-        const rows = await command.func({ limit: 10 }, false);
-        expect(mockExecFileSync).toHaveBeenCalledWith('bili', ['history', '--json'], expect.any(Object));
-        expect(rows).toEqual([{ rank: 1, bvid: 'BV1', title: '视频1', author: 'UP1', viewed_at: '2026-06-02T10:00:00' }]);
-    });
-
-    it('bridges bilibili feed through bili --json and keeps next_offset', async () => {
-        mockExecFileSync.mockReturnValue(JSON.stringify({
-            ok: true,
-            data: {
-                items: [{ id: '900', author: { name: 'UP' }, published_label: '1小时前', title: '动态标题', type: 'video', stats: { like: 12 } }],
-                next_offset: 'cursor-2',
-            },
-        }));
-        const command = getRegistry().get('bilibili/feed-bridge');
-        const result = await command.func({ limit: 10 }, false);
-        expect(mockExecFileSync).toHaveBeenCalledWith('bili', ['feed', '--json'], expect.any(Object));
-        expect(result).toEqual({
-            items: [{ rank: 1, time: '1小时前', author: 'UP', title: '动态标题', type: 'video', likes: 12, url: 'https://t.bilibili.com/900' }],
-            next_offset: 'cursor-2',
-        });
-    });
 
     it('bridges bilibili my-dynamics through bili --json and keeps next_offset', async () => {
         mockExecFileSync.mockReturnValue(JSON.stringify({

@@ -172,7 +172,7 @@ When the site you need is not yet covered, use the `opencli-adapter-author` skil
 |------|----------|
 | **xiaohongshu** | `search` `note` `comments` `feed` `user` `download` `publish` `notifications` `creator-notes` `creator-notes-summary` `creator-note-detail` `creator-profile` `creator-stats` |
 | **WeChat Channels** (视频号) | `publish` |
-| **bilibili** | `hot` `search` `status` `history` `history-bridge` `feed` `feed-bridge` `my-dynamics` `dynamic-post` `dynamic-delete` `ranking` `download` `comments` `dynamic` `favorite` `favorites` `following` `following-bridge` `me` `whoami` `user` `watch-later` `subtitle` `summary` `video` `user-videos` |
+| **bilibili** | `hot` `search` `status` `history` `feed` `my-dynamics` `dynamic-post` `dynamic-delete` `ranking` `download` `comments` `dynamic` `favorite` `favorites` `following` `me` `whoami` `user` `watch-later` `subtitle` `summary` `video` `user-videos` |
 | **zhihu** | `hot` `search` `question` `download` `follow` `like` `favorite` `comment` `answer` |
 | **hackernews** | `top` `new` `best` `ask` `show` `jobs` `search` `user` |
 | **geogebra** | `eval` `add-point` `add-line` `add-circle` `add-polygon` `triangle` `hexagon` `list` `info` |

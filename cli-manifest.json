@@ -3357,33 +3357,6 @@
   },
   {
     "site": "bilibili",
-    "name": "feed-bridge",
-    "description": "通过 bilibili-cli 读取动态时间线",
-    "access": "read",
-    "strategy": "local",
-    "browser": false,
-    "args": [
-      {
-        "name": "offset",
-        "type": "str",
-        "required": false,
-        "help": "Pagination cursor returned by a previous feed-bridge call"
-      },
-      {
-        "name": "limit",
-        "type": "int",
-        "default": 20,
-        "required": false,
-        "help": "Maximum items to return from the current page"
-      }
-    ],
-    "defaultFormat": "json",
-    "type": "js",
-    "modulePath": "bilibili/feed-bridge.js",
-    "sourceFile": "bilibili/feed-bridge.js"
-  },
-  {
-    "site": "bilibili",
     "name": "feed-detail",
     "description": "查看 Bilibili 动态详情（支持充电专属内容）",
     "access": "read",
@@ -3464,23 +3437,6 @@
   },
   {
     "site": "bilibili",
-    "name": "following-bridge",
-    "description": "通过 bilibili-cli 读取当前账号的关注列表",
-    "access": "read",
-    "strategy": "local",
-    "browser": false,
-    "args": [],
-    "columns": [
-      "id",
-      "name",
-      "sign"
-    ],
-    "type": "js",
-    "modulePath": "bilibili/following-bridge.js",
-    "sourceFile": "bilibili/following-bridge.js"
-  },
-  {
-    "site": "bilibili",
     "name": "history",
     "description": "我的观看历史",
     "access": "read",
@@ -3519,33 +3475,6 @@
     "modulePath": "bilibili/history.js",
     "sourceFile": "bilibili/history.js",
     "navigateBefore": "https://www.bilibili.com"
-  },
-  {
-    "site": "bilibili",
-    "name": "history-bridge",
-    "description": "通过 bilibili-cli 读取观看历史",
-    "access": "read",
-    "strategy": "local",
-    "browser": false,
-    "args": [
-      {
-        "name": "limit",
-        "type": "int",
-        "default": 30,
-        "required": false,
-        "help": "Maximum items to return"
-      }
-    ],
-    "columns": [
-      "rank",
-      "bvid",
-      "title",
-      "author",
-      "viewed_at"
-    ],
-    "type": "js",
-    "modulePath": "bilibili/history-bridge.js",
-    "sourceFile": "bilibili/history-bridge.js"
   },
   {
     "site": "bilibili",

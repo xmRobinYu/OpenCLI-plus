@@ -6,31 +6,31 @@
 
 | Command | Description |
 |---------|-------------|
-| `opencli bilibili hot` | |
-| `opencli bilibili search` | |
-| `opencli bilibili me` | |
+| `opencli bilibili hot` | Read the Bilibili hot list |
+| `opencli bilibili search` | Search videos or users on Bilibili |
+| `opencli bilibili me` | Read the current account profile from the native browser adapter |
 | `opencli bilibili status` | Check current login status via `bili status` |
 | `opencli bilibili whoami` | Read detailed account info via `bili whoami` |
 | `opencli bilibili user <uid-or-name>` | Read a specific UP profile via `bili user` |
 | `opencli bilibili favorite` | Read your first favorite folder, or a specific folder with `--fid` |
 | `opencli bilibili favorites` | List favorite folders via `bili favorites` |
-| `opencli bilibili history` | |
+| `opencli bilibili history` | Read watch history; also supports `--backend bridge` |
 | `opencli bilibili watch-later` | Read watch-later items via `bili watch-later` |
 | `opencli bilibili my-dynamics` | Read your own dynamics via `bili my-dynamics`, preserving `next_offset` |
 | `opencli bilibili dynamic-post` | Publish a text dynamic via `bili dynamic-post` |
 | `opencli bilibili dynamic-delete` | Delete a dynamic via `bili dynamic-delete` |
-| `opencli bilibili feed` | Read the following feed, or a specific user's dynamics by uid/name |
+| `opencli bilibili feed` | Read the following feed, or a specific user's dynamics by uid/name; also supports `--backend bridge` |
 | `opencli bilibili feed-detail` | Read one dynamic in detail, including exclusive content |
-| `opencli bilibili subtitle` | |
+| `opencli bilibili subtitle` | Read subtitles for a Bilibili video |
 | `opencli bilibili video` | Get one video's metadata (title, author, duration, stats) by BV / URL / b23.tv link |
 | `opencli bilibili summary` | Get the official AI video summary and timestamped outline by BV / URL / b23.tv link |
 | `opencli bilibili comments` | Read top-level comments, or read replies under a top-level comment with `--parent` |
 | `opencli bilibili comment` | Post a top-level comment or reply under a top-level comment (requires `--execute`) |
-| `opencli bilibili dynamic` | |
-| `opencli bilibili ranking` | |
-| `opencli bilibili following` | |
-| `opencli bilibili user-videos` | |
-| `opencli bilibili download` | |
+| `opencli bilibili dynamic` | Read your following timeline from the native browser adapter |
+| `opencli bilibili ranking` | Read the Bilibili ranking board |
+| `opencli bilibili following` | Read the following list; also supports `--backend bridge` |
+| `opencli bilibili user-videos` | Read one creator's uploaded videos |
+| `opencli bilibili download` | Download a video via `yt-dlp` |
 
 ## Usage Examples
 

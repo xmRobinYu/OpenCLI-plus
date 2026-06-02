@@ -11,6 +11,7 @@
 
 ## 参考文档
 
+- [Bilibili / 哔哩哔哩](/zh/adapters/browser/bilibili)
 - [飞书 / Lark 文档](/zh/adapters/browser/feishu)
 - [知识星球 ZSXQ](/zh/adapters/browser/zsxq)
 - 更多适配器能力请参考 [英文总览](/adapters/)

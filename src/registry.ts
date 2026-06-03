@@ -28,6 +28,7 @@ export type BrowserCommandFunc = (page: IPage, kwargs: CommandArgs, debug?: bool
 export type NonBrowserCommandFunc = (kwargs: CommandArgs, debug?: boolean) => Promise<unknown>;
 export type CommandAccess = 'read' | 'write';
 export type SiteSessionMode = 'ephemeral' | 'persistent';
+export type BrowserRequirementResolver = (kwargs: CommandArgs) => boolean;
 
 interface BaseCliCommand {
   site: string;
@@ -64,6 +65,8 @@ interface BaseCliCommand {
   navigateBefore?: boolean | string;
   /** Site session lifecycle for adapter commands. */
   siteSession?: SiteSessionMode;
+  /** Optional runtime override for whether this invocation actually needs a browser session. */
+  needsBrowserSession?: BrowserRequirementResolver;
   /** Override the default CLI output format when the user does not pass -f/--format. */
   defaultFormat?: 'table' | 'plain' | 'json' | 'yaml' | 'yml' | 'md' | 'markdown' | 'csv';
 }
@@ -138,6 +141,7 @@ export function cli(opts: CliOptions): CliCommand {
     validateArgs: opts.validateArgs,
     navigateBefore: opts.navigateBefore,
     siteSession: opts.siteSession,
+    needsBrowserSession: opts.needsBrowserSession,
     defaultFormat: opts.defaultFormat,
   };
 

@@ -709,4 +709,24 @@ describe('executeCommand — non-browser timeout', () => {
       vi.restoreAllMocks();
     }
   });
+
+  it('skips browser session when a browser command declares the bridge backend does not need one', async () => {
+    const browserSessionSpy = vi.spyOn(runtime, 'browserSession');
+    const cmd = cli({
+      site: 'test-execution',
+      name: 'bridge-backend-no-browser', access: 'read',
+      description: 'bridge backend can run without browser session',
+      browser: true,
+      strategy: Strategy.COOKIE,
+      needsBrowserSession: (kwargs) => kwargs.backend !== 'bridge',
+      args: [{ name: 'backend', default: 'native', help: 'native or bridge' }],
+      func: async (page, kwargs) => [{ backend: kwargs.backend, pageProvided: page !== null }],
+    });
+
+    const result = await executeCommand(cmd, { backend: 'bridge' });
+
+    expect(browserSessionSpy).not.toHaveBeenCalled();
+    expect(result).toEqual([{ backend: 'bridge', pageProvided: false }]);
+    vi.restoreAllMocks();
+  });
 });

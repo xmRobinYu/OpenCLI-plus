@@ -1,4 +1,4 @@
-import type { CliCommand } from './registry.js';
+import type { CliCommand, CommandArgs } from './registry.js';
 import { getRegisteredStepNames } from './pipeline/registry.js';
 
 /**
@@ -43,7 +43,8 @@ function pipelineNeedsBrowserSession(pipeline: Record<string, unknown>[]): boole
   });
 }
 
-export function shouldUseBrowserSession(cmd: CliCommand): boolean {
+export function shouldUseBrowserSession(cmd: CliCommand, kwargs?: CommandArgs): boolean {
+  if (cmd.needsBrowserSession && kwargs) return cmd.needsBrowserSession(kwargs);
   if (!cmd.browser) return false;
   if (cmd.func) return true;
   if (!cmd.pipeline || cmd.pipeline.length === 0) return true;

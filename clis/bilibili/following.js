@@ -9,6 +9,7 @@ cli({
     description: '获取 Bilibili 用户的关注列表',
     domain: 'www.bilibili.com',
     strategy: Strategy.COOKIE,
+    needsBrowserSession: (kwargs) => kwargs.backend !== 'bridge',
     args: [
         { name: 'uid', positional: true, required: false, help: '目标用户 ID（默认为当前登录用户）' },
         { name: 'page', type: 'int', required: false, default: 1, help: '页码' },

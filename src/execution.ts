@@ -151,10 +151,10 @@ async function runCommand(
 
 function runCommandFunc(cmd: CliCommand, page: IPage | null, kwargs: CommandArgs, debug: boolean): Promise<unknown> {
   if (cmd.browser === false) return cmd.func!(kwargs, debug);
-  if (!page) {
+  if (!page && shouldUseBrowserSession(cmd, kwargs)) {
     throw new CommandExecutionError(`Command ${fullName(cmd)} requires a browser session but none was provided`);
   }
-  return (cmd as BrowserCliCommand).func!(page, kwargs, debug);
+  return (cmd as BrowserCliCommand).func!(page as never, kwargs, debug);
 }
 
 function resolvePreNav(cmd: CliCommand): string | null {
@@ -227,7 +227,7 @@ export async function executeCommand(
 
   let result: unknown;
   try {
-    if (shouldUseBrowserSession(cmd)) {
+    if (shouldUseBrowserSession(cmd, kwargs)) {
       const electron = isElectronApp(cmd.site);
       let cdpEndpoint: string | undefined;
 

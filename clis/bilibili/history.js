@@ -8,6 +8,7 @@ cli({
     description: '我的观看历史',
     domain: 'www.bilibili.com',
     strategy: Strategy.COOKIE,
+    needsBrowserSession: (kwargs) => kwargs.backend !== 'bridge',
     args: [
         { name: 'limit', type: 'int', default: 20, help: 'Number of results' },
         { name: 'backend', required: false, default: 'native', choices: ['native', 'bridge'], help: 'Data source backend: native browser API or bridged bili CLI' },

@@ -71,6 +71,7 @@ cli({
     description: '动态时间线（不传 uid 查关注时间线，传 uid 查指定用户动态）',
     domain: 'www.bilibili.com',
     strategy: Strategy.COOKIE,
+    needsBrowserSession: (kwargs) => kwargs.backend !== 'bridge',
     args: [
         { name: 'uid', positional: true, required: false, help: '用户 UID 或用户名（不传则显示关注时间线）' },
         { name: 'limit', type: 'int', default: 20, help: 'Max results to return' },
